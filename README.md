@@ -1,1 +1,1 @@
-# gse10b2psql-docker
+# gse10b2-docker
