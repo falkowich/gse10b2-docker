@@ -7,7 +7,7 @@ COPY script/startup.sh /startup.sh
 ENV DEBIAN_FRONTEND=noninteractive \
     GSE_PASSWORD=admin \
     HOSTNAME=gs \
-    SRC_DIR=gse10b2 \
+    SRC_DIR=gse-git \
     SRC_PATH=/root/${SRC_DIR}
 
 RUN apt-get update ;\
@@ -75,18 +75,14 @@ RUN curl --silent --show-error https://dl.yarnpkg.com/debian/pubkey.gpg | apt-ke
 
 RUN mkdir ${SRC_PATH} -p ;\
     cd ${SRC_PATH} ;\
-    wget -O gvm-libs-1.0-beta2.tar.gz https://github.com/greenbone/gvm-libs/archive/v1.0+beta2.tar.gz ;\
-    wget -O openvas-scanner-6.0-beta2.tar.gz https://github.com/greenbone/openvas-scanner/archive/v6.0+beta2.tar.gz ;\
-    wget -O gvmd-8.0-beta2.tar.gz https://github.com/greenbone/gvmd/archive/v8.0+beta2.tar.gz ;\
-    wget -O gsa-8.0-beta2.tar.gz https://github.com/greenbone/gsa/archive/v8.0+beta2.tar.gz ;\
-    wget -O ospd-1.3.2.tar.gz https://github.com/greenbone/ospd/archive/v1.3.2.tar.gz ;\
-    wget -O openvas-smb-1.0.4.tar.gz https://github.com/greenbone/openvas-smb/archive/v1.0.4.tar.gz 
+    git clone https://github.com/greenbone/gvm-libs.git ;\
+    git clone https://github.com/greenbone/openvas-scanner.git ;\
+    git clone https://github.com/greenbone/gvmd.git ;\
+    git clone https://github.com/greenbone/gsa.git ;\
+    git clone https://github.com/greenbone/ospd.git ;\
+    git clone https://github.com/greenbone/openvas-smb.git
 
-RUN cd ${SRC_PATH} ;\
-    find . -name \*.gz -exec tar zxvfp {} \;
-
-
-RUN  cd ${SRC_PATH}/gvm-libs-1.0-beta2 ;\
+RUN  cd ${SRC_PATH}/gvm-libs ;\
     mkdir build ;\
     cd build ;\
     cmake .. ;\
@@ -95,7 +91,7 @@ RUN  cd ${SRC_PATH}/gvm-libs-1.0-beta2 ;\
     make install ;\
     cd ${SRC_PATH}
 
-RUN  cd ${SRC_PATH}/openvas-smb-1.0.4 ;\
+RUN  cd ${SRC_PATH}/openvas-smb ;\
     mkdir build ;\
     cd build/ ;\
     cmake .. ;\
@@ -103,7 +99,7 @@ RUN  cd ${SRC_PATH}/openvas-smb-1.0.4 ;\
     make install ;\
     cd ${SRC_PATH}
 
-RUN  cd ${SRC_PATH}/openvas-scanner-6.0-beta2 ;\
+RUN  cd ${SRC_PATH}/openvas-scanner ;\
     mkdir build ;\
     cd build/ ;\
     cmake .. ;\
@@ -114,7 +110,7 @@ RUN  cd ${SRC_PATH}/openvas-scanner-6.0-beta2 ;\
 
 # Fix redis for default openvas install
 RUN cp /etc/redis/redis.conf /etc/redis/redis.orig ;\
-    cp ${SRC_PATH}/openvas-scanner-6.0-beta2/build/doc/redis_config_examples/redis_4_0.conf /etc/redis/redis.conf ;\
+    cp ${SRC_PATH}/openvas-scanner/build/doc/redis_config_examples/redis_4_0.conf /etc/redis/redis.conf ;\
     sed -i 's|/usr/local/var/run/openvas-redis.pid|/var/run/redis/redis-server.pid|g' /etc/redis/redis.conf ;\
     sed -i 's|/tmp/redis.sock|/var/run/redis/redis-server.sock|g' /etc/redis/redis.conf ;\
     sed -i 's|dir ./|dir /var/lib/redis|g' /etc/redis/redis.conf
@@ -123,7 +119,7 @@ RUN service redis-server restart
 
 RUN greenbone-nvt-sync 
 
-RUN cd ${SRC_PATH}/gvmd-8.0-beta2 ;\
+RUN cd ${SRC_PATH}/gvmd ;\
     mkdir build ;\
     cd build/ ;\
     cmake .. ;\
@@ -134,7 +130,7 @@ RUN cd ${SRC_PATH}/gvmd-8.0-beta2 ;\
 
 RUN ldconfig
 
-RUN cd ${SRC_PATH}/gsa-8.0-beta2 ;\
+RUN cd ${SRC_PATH}/gsa ;\
     mkdir build ;\
     cd build/ ;\
     cmake .. ;\

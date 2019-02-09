@@ -1,4 +1,4 @@
-# gse10b2psql-docker
+# gse10b2-docker
 
 To try out the first sqlite build without persistant data.
 
