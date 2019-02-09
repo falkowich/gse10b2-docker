@@ -1,9 +1,15 @@
-# gse10b2-docker
+# gse10-docker
 
 To try out the first sqlite build without persistant data.
 
 ```
 docker run -p 443:443 falkowich/gse10b2:sqlite3
+```
+
+To try out sqlite - git master bransh build without persistant data.
+
+```
+docker run -p 443:443 falkowich/gse10b2:git-master
 ```
 
 ### WebUI:
