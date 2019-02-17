@@ -8,7 +8,9 @@ ENV DEBIAN_FRONTEND=noninteractive \
     GSE_PASSWORD=admin \
     HOSTNAME=gs \
     SRC_DIR=gse-git \
-    SRC_PATH=/root/${SRC_DIR}
+    SRC_PATH=/root/${SRC_DIR} \
+    PGUSERNAME=root
+
 
 RUN apt-get update ;\
     apt-get install apt-utils software-properties-common --no-install-recommends -yq ;\
@@ -122,11 +124,19 @@ RUN greenbone-nvt-sync
 RUN cd ${SRC_PATH}/gvmd ;\
     mkdir build ;\
     cd build/ ;\
-    cmake .. ;\
+    cmake -DBACKEND=POSTGRESQL .. ;\
     make ;\
     make doc-full ;\
     make install ;\
     cd ${SRC_PATH}
+
+
+RUN service postgresql start ;\
+    su postgres sh -c "createuser -DRS root " ;\
+    su postgres sh -c "createdb -O root gvmd" ;\
+    su postgres sh -c "psql gvmd \-c \"create role dba with superuser noinherit;\"" \
+    su postgres sh -c "psql gvmd \-c \"grant dba to root;\"" \
+    su postgres sh -c "psql gvmd \-c \"create extension \"uuid\-ossp\"';\"" 
 
 RUN ldconfig
 

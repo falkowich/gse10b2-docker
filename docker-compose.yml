@@ -1,0 +1,24 @@
+version: '3'
+services:
+  psql:
+    image: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: gvmd
+
+
+  gse:
+    build: .
+    ports: 
+      - 443:443
+    depends_on:
+      - psql
+volumes:
+  db-data:
+    driver: local
