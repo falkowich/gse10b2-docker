@@ -3,6 +3,9 @@
 DATAVOL=/usr/local/var/lib/gvm/
 #OV_PASSWORD=${OV_PASSWORD:-admin}
 
+# Restart postgresql
+service postgresql restart
+
 # Restart redis
 service redis-server restart
 

@@ -2,6 +2,7 @@ FROM ubuntu:18.04
 
 COPY conf/redis.config /etc/redis/redis.config
 COPY conf/openvassd.conf /usr/local/etc/openvas/openvassd.conf
+COPY script/postgresqlconf.sh /postgresqlconf.sh
 COPY script/startup.sh /startup.sh
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -131,12 +132,8 @@ RUN cd ${SRC_PATH}/gvmd ;\
     cd ${SRC_PATH}
 
 
-RUN service postgresql start ;\
-    su postgres sh -c "createuser -DRS root " ;\
-    su postgres sh -c "createdb -O root gvmd" ;\
-    su postgres sh -c "psql gvmd \-c \"create role dba with superuser noinherit;\"" \
-    su postgres sh -c "psql gvmd \-c \"grant dba to root;\"" \
-    su postgres sh -c "psql gvmd \-c \"create extension \"uuid\-ossp\"';\"" 
+RUN chmod 755 /postgresqlconf.sh ;\
+    /postgresqlconf.sh
 
 RUN ldconfig
 
@@ -153,7 +150,8 @@ RUN cd ${SRC_PATH}/gsa ;\
 RUN gvm-manage-certs -a
 
 # create admin user
-RUN gvmd --create-user=admin --password=admin
+RUN service postgresql restart ;\
+    gvmd --create-user=admin --password=admin
 
 RUN greenbone-certdata-sync ;\
     greenbone-scapdata-sync
