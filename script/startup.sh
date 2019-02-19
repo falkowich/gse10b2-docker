@@ -1,10 +1,10 @@
 #!/bin/bash
 
 DATAVOL=/usr/local/var/lib/gvm/
+DBVOL=/var/lib/postgresql/
 #OV_PASSWORD=${OV_PASSWORD:-admin}
 
-# Restart postgresql
-service postgresql restart
+/postgresqlconf.sh
 
 # Restart redis
 service redis-server restart
@@ -30,13 +30,24 @@ echo "Redis ready."
 #./openvas-check-setup --v9
 
 
-openvassd ;\
-gvmd ;\
-gsad 
+
+
+RUN gvm-manage-certs -a
+
+# create admin user
+gvmd --create-user=admin --password=admin
+
+greenbone-certdata-sync ;\
+greenbone-scapdata-sync
+
 
 # Do some if then here.
 #greenbone-certdata-sync ;\
 #greenbone-scapdata-sync
+
+openvassd ;\
+gvmd ;\
+gsad 
 
 
 if [ -z "$BUILD" ]; then

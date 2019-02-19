@@ -12,6 +12,12 @@ To try out sqlite - git master bransh build without persistant data.
 docker run -p 443:443 falkowich/gse10b2:git-master
 ```
 
+To try out postgresql - git master bransh build with persistant data.
+
+```
+docker run -p 443:443 -v ~/docker/gse10/gse:/var/lib/openvas/mgr/ -v ~/docker/gse10/db:/var/lib/postgresql/data falkowich/gse10b2:master-postgresql
+```
+
 ### WebUI:
 user/pass - admin/admin
 
